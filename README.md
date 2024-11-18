@@ -1,1 +1,1 @@
-# Timetable-Management-Tool
+# Timetable-Management-System
