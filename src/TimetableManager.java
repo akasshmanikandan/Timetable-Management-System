@@ -3,7 +3,7 @@ package timetable;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
-//This class will manage CRUD operations and handle serialization and deserialization
+
 public class TimetableManager {
     private static final String FILE_PATH = "C:\\Users\\sId nAgA\\git\\Timetable-Management-System\\Timetable-Management-System\\resources";
  
@@ -15,18 +15,16 @@ public class TimetableManager {
    
     
 
-    // Add a new event
+   
     public void addEvent(TimetableEvent event) {
         events.add(event);
         saveEvents();
     }
 
-    // Retrieve all events
     public List<TimetableEvent> getEvents() {
         return new ArrayList<>(events);
     }
 
-    // Update an event
     public void updateEvent(int index, TimetableEvent updatedEvent) {
         if (index >= 0 && index < events.size()) {
             events.set(index, updatedEvent);
@@ -34,7 +32,6 @@ public class TimetableManager {
         }
     }
 
-    // Delete an event
     public void deleteEvent(int index) {
         if (index >= 0 && index < events.size()) {
             events.remove(index);
@@ -42,7 +39,6 @@ public class TimetableManager {
         }
     }
 
-    // Save events to file
     private void saveEvents() {
         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(FILE_PATH))) {
             oos.writeObject(events);
@@ -51,7 +47,6 @@ public class TimetableManager {
         }
     }
 
-    // Load events from file
     @SuppressWarnings("unchecked")
     private List<TimetableEvent> loadEvents() {
         File file = new File(FILE_PATH);
