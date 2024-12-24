@@ -1,0 +1,24 @@
+package timetable;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class TimetableService {
+    private List<Timetable> timetableList;
+
+    public TimetableService() {
+        this.timetableList = FileHandler.loadFromFile();
+    }
+
+    // Add a new timetable entry
+    public void addTimetableEntry(String day, String time, String subject, String teacher) {
+        Timetable newEntry = new Timetable(day, time, subject, teacher);
+        timetableList.add(newEntry);
+        FileHandler.saveToFile(timetableList);
+    }
+
+    // Get all timetable entries
+    public List<Timetable> getTimetableEntries() {
+        return timetableList;
+    }
+}
