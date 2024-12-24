@@ -1,0 +1,20 @@
+package timetable;
+
+import java.util.List;
+
+public class TimetableTest {
+    public static void main(String[] args) {
+        TimetableService service = new TimetableService();
+
+        // Adding entries
+        service.addTimetableEntry("wednesday", "09:00 AM", "SMQ", "Mr. Fuxiang");
+        service.addTimetableEntry("friday", "10:00 AM", "Agile", "Mr. Artur");
+
+        // Retrieving entries
+        List<Timetable> entries = service.getTimetableEntries();
+        System.out.println("Timetable Entries:");
+        for (Timetable entry : entries) {
+            System.out.println(entry);
+        }
+    }
+}
