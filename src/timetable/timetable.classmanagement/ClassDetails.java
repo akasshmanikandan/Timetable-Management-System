@@ -1,17 +1,28 @@
 package timetable.classmanagement;
+
 import java.io.Serializable;
 
 public class ClassDetails implements Serializable {
     private static final long serialVersionUID = 1L;
 
+    private String day;
     private String subject;
     private String time;
     private String instructor;
 
-    public ClassDetails(String subject, String time, String instructor) {
+    public ClassDetails(String day, String subject, String time, String instructor) {
+        this.day = day;
         this.subject = subject;
         this.time = time;
         this.instructor = instructor;
+    }
+
+    public String getDay() {
+        return day;
+    }
+
+    public void setDay(String day) {
+        this.day = day;
     }
 
     public String getSubject() {
@@ -41,11 +52,10 @@ public class ClassDetails implements Serializable {
     @Override
     public String toString() {
         return "ClassDetails{" +
-                "subject='" + subject + '\'' +
+                "day='" + day + '\'' +
+                ", subject='" + subject + '\'' +
                 ", time='" + time + '\'' +
                 ", instructor='" + instructor + '\'' +
                 '}';
     }
 }
-
-
