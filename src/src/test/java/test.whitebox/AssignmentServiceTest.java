@@ -1,4 +1,4 @@
-package test.whiteboxbox;
+package test.whitebox;
 
 import timetable.assignmet.Assignment;
 import timetable.assignmet.AssignmentService;
@@ -84,5 +84,70 @@ class AssignmentServiceTest {
         // verifies
         List<Assignment> assignments = assignmentService.getAssignments();
         assertEquals(2, assignments.size(), "There should be 2 assignments.");
+        
+        
+        
     }
+    
+    @Test
+    void testChangePassword() {
+        authService.register("user1", "password1");
+        assertTrue(authService.changePassword("user1", "password1", "newpassword"), "Password change should succeed.");
+        assertFalse(authService.login("user1", "password1"), "Old password should not work.");
+        assertTrue(authService.login("user1", "newpassword"), "New password should work.");
+    }
+
+    @Test
+    void testResetPassword() {
+        authService.register("user2", "password2");
+        assertTrue(authService.resetPassword("user2", "newpassword2"), "Password reset should succeed.");
+        assertFalse(authService.login("user2", "password2"), "Old password should not work.");
+        assertTrue(authService.login("user2", "newpassword2"), "New password should work.");
+    }
+    
+    @Test
+    void testCalculateProgress() {
+        assignmentService.addAssignment("SMQA", "Complete the report", "2025-01-17", "High", 0);
+        assignmentService.calculateProgress("SMQA", 5, 10);
+
+        List<Assignment> assignments = assignmentService.getAssignments();
+        assertEquals(50, assignments.get(0).getProgress(), "Progress should be 50%.");
+    }
+
+    @Test
+    void testMarkAsComplete() {
+        assignmentService.addAssignment("SMQA", "Complete the report", "2025-01-17", "High", 0);
+        assignmentService.markAsComplete("SMQA");
+
+        List<Assignment> assignments = assignmentService.getAssignments();
+        assertEquals(100, assignments.get(0).getProgress(), "Progress should be 100%.");
+    }
+
+    @Test
+    void testSortByPriority() {
+        assignmentService.addAssignment("Assignment1", "Task 1", "2025-01-17", "High", 0);
+        assignmentService.addAssignment("Assignment2", "Task 2", "2025-01-15", "Low", 0);
+        assignmentService.addAssignment("Assignment3", "Task 3", "2025-01-10", "Medium", 0);
+
+        List<Assignment> sortedByPriority = assignmentService.sortByPriority();
+        assertEquals("Low", sortedByPriority.get(0).getPriority(), "First priority should be 'Low'.");
+        assertEquals("Medium", sortedByPriority.get(1).getPriority(), "Second priority should be 'Medium'.");
+        assertEquals("High", sortedByPriority.get(2).getPriority(), "Third priority should be 'High'.");
+    }
+
+    @Test
+    void testSortByDeadline() {
+        assignmentService.addAssignment("Assignment1", "Task 1", "2025-01-17", "High", 0);
+        assignmentService.addAssignment("Assignment2", "Task 2", "2025-01-15", "Low", 0);
+        assignmentService.addAssignment("Assignment3", "Task 3", "2025-01-10", "Medium", 0);
+
+        List<Assignment> sortedByDeadline = assignmentService.sortByDeadline();
+        assertEquals("2025-01-10", sortedByDeadline.get(0).getDeadline(), "First deadline should be '2025-01-10'.");
+        assertEquals("2025-01-15", sortedByDeadline.get(1).getDeadline(), "Second deadline should be '2025-01-15'.");
+        assertEquals("2025-01-17", sortedByDeadline.get(2).getDeadline(), "Third deadline should be '2025-01-17'.");
+    }
+
+    
+    
 }
+
