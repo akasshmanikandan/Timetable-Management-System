@@ -4,6 +4,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class TimetableService {
     private List<Timetable> timetableList;
@@ -31,13 +32,6 @@ public class TimetableService {
         FileHandler.saveToFile(timetableList, fileName); // Save updated list to file
         System.out.println("Timetable entry added: " + newEntry);
     }
-    public void addRecurringEvent(String day, String time, String subject, String teacher, String recurrencePattern) {
-        Timetable recurringEvent = new Timetable(day, time, subject, teacher, true, recurrencePattern);
-        timetableList.add(recurringEvent);
-        FileHandler.saveToFile(timetableList, fileName);
-        System.out.println("Recurring timetable entry added: " + recurringEvent);
-    }
-
 
     // Update an existing timetable entry
     public void updateTimetableEntry(String day, String time, String newDay, String newTime, String newSubject, String newTeacher) {
@@ -76,82 +70,75 @@ public class TimetableService {
             System.out.println("Error: No matching timetable entry found for teacher: " + teacher + " at: " + time);
         }
     }
+    
+    //generates a daily summary
+    public List<Timetable> getDailySummary(String day) {
+        return timetableList.stream()
+                .filter(entry -> entry.getDay().equalsIgnoreCase(day))
+                .collect(Collectors.toList());
+    }
 
-    // Display all timetable entries
+    //weekly summary
+    public List<Timetable> getWeeklySummary() {
+        return new ArrayList<>(timetableList); 
+    }
+
+    //monthly summary
+    public List<Timetable> getMonthlySummary() {
+      
+        return new ArrayList<>(timetableList);
+    }
+    public void displaySummary(List<Timetable> summary) {
+        if (summary == null || summary.isEmpty()) {
+            System.out.println("No timetable entries found for the specified period.");
+        } else {
+            System.out.println("\nTimetable Summary:");
+            for (Timetable entry : summary) {
+                System.out.println(entry);
+            }
+        }
+    }
+    //export data to text file
+    public void exportToTextFile(String exportFileName) {
+        try (FileWriter writer = new FileWriter(exportFileName)) {
+            for (Timetable entry : timetableList) {
+                writer.write(entry.toString() + "\n");
+            }
+            System.out.println("Timetable data exported successfully to " + exportFileName);
+        } catch (IOException e) {
+            System.err.println("Error exporting to text file: " + e.getMessage());
+        }
+    }
+
+    //export to a CSV file
+    public void exportToCSVFile(String exportFileName) {
+        try (FileWriter writer = new FileWriter(exportFileName)) {
+            // Write CSV headers
+            writer.write("Day,Time,Subject,Teacher\n");
+            for (Timetable entry : timetableList) {
+                writer.write(entry.getDay() + "," + entry.getTime() + "," + entry.getSubject() + "," + entry.getTeacher() + "\n");
+            }
+            System.out.println("Timetable data exported successfully to " + exportFileName);
+        } catch (IOException e) {
+            System.err.println("Error exporting to CSV file: " + e.getMessage());
+        }
+    }
+
+    //display all timetable entries
     public void displayTimetable() {
         if (timetableList.isEmpty()) {
             System.out.println("No timetable entries found.");
             return;
         }
-        
-        
 
         System.out.println("\nTimetable Entries:");
         for (Timetable entry : timetableList) {
             System.out.println(entry);
         }
     }
-    public void processRecurringEvents() {
-        List<Timetable> newEvents = new ArrayList<>();
-        for (Timetable entry : timetableList) {
-            if (entry.isRecurring()) {
-                if ("daily".equalsIgnoreCase(entry.getRecurrencePattern())) {
-                    for (String day : List.of("Monday", "Tuesday", "Wednesday", "Thursday", "Friday")) {
-                        if (!day.equalsIgnoreCase(entry.getDay())) {
-                            newEvents.add(new Timetable(day, entry.getTime(), entry.getSubject(), entry.getTeacher(), false, null));
-                        }
-                    }
-                } else if ("weekly".equalsIgnoreCase(entry.getRecurrencePattern())) {
-                    // Logic for weekly events (no additional days needed)
-                    newEvents.add(entry);
-                }
-            }
-        }
-        timetableList.addAll(newEvents);
-        FileHandler.saveToFile(timetableList, fileName);
-        System.out.println("Processed recurring events.");
-    }
-
-    public void generateDailySummary(String day) {
-        System.out.println("Daily Summary for: " + day);
-        timetableList.stream()
-                .filter(entry -> entry.getDay().equalsIgnoreCase(day))
-                .forEach(System.out::println);
-    }
-
-    public void generateWeeklySummary() {
-        System.out.println("Weekly Summary:");
-        timetableList.stream()
-                .forEach(System.out::println);
-    }
-
-    public void generateMonthlySummary() {
-        System.out.println("Monthly Summary:");
-        timetableList.stream()
-                .forEach(System.out::println); // Logic can be enhanced for specific months
-    }
-
 
     // Get all timetable entries
     public List<Timetable> getTimetableEntries() {
         return timetableList;
     }
-    
-    
-    public void exportToCSV(String filePath) {
-        try (FileWriter writer = new FileWriter(filePath)) {
-            writer.write("Day,Time,Subject,Teacher\n");
-            for (Timetable entry : timetableList) {
-                writer.write(entry.getDay() + "," + entry.getTime() + "," +
-                        entry.getSubject() + "," + entry.getTeacher() + "\n");
-            }
-            System.out.println("Timetable exported to: " + filePath);
-        } catch (IOException e) {
-            System.err.println("Error exporting timetable: " + e.getMessage());
-        }
-    }
-
 }
-
-
-
