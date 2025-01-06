@@ -4,7 +4,6 @@ import timetable.classmanagement.ClassDetails;
 import timetable.classmanagement.ClassManagementService;
 import timetable.Authentication.AuthenticationService;
 import timetable.assignmet.AssignmentService;
-import timetable.attendance.AttendanceService;
 
 import java.util.List;
 import java.util.Scanner;
@@ -25,12 +24,11 @@ public class Main {
             System.out.println("2. Manage Assignments");
             System.out.println("3. Manage Classes");
             System.out.println("4. Manage Authentication");
-            System.out.println("5. Manage Attendance");
-            System.out.println("6. Exit");
+            System.out.println("5. Exit");
             System.out.print("Enter your choice: ");
 
             if (!scanner.hasNextInt()) {
-                System.out.println("Invalid input. Please enter a valid number.");
+                System.out.println("Invalid! Please enter a valid number.");
                 scanner.next();
                 continue;
             }
@@ -54,15 +52,11 @@ public class Main {
                     manageAuthentication(scanner, authService);
                     break;
                 case 5:
-                    manageAttendance(scanner, new AttendanceService("attendance_data.ser"));
-                    break;
-
-                case 6:
-                    System.out.println("Exiting System. Goodbye!");
+                    System.out.println("Exiting System.");
                     break;
 
                 default:
-                    System.out.println("Invalid choice. Please try again.");
+                    System.out.println("Please try again.");
             }
         } while (choice != 5);
 
@@ -70,18 +64,22 @@ public class Main {
     }
 
     private static void manageTimetable(Scanner scanner, TimetableService timetableService) {
-        int timetableChoice = 5;
+        int timetableChoice = 8; // Updated to include summary options
         do {
             System.out.println("\n=== || Timetable Management || ===");
             System.out.println("1. Add Timetable Event");
             System.out.println("2. View Timetable Events");
             System.out.println("3. Update Timetable Event");
             System.out.println("4. Delete Timetable Event");
-            System.out.println("5. Back to Main Menu");
+            System.out.println("5. Daily Summary");
+            System.out.println("6. Weekly Summary");
+            System.out.println("7. Monthly Summary");
+            System.out.println("8. Export Timetable Data");
+            System.out.println("9. Back to Main Menu");
             System.out.print("Enter your choice: ");
 
             if (!scanner.hasNextInt()) {
-                System.out.println("Invalid input. Please enter a number between 1 and 5.");
+                System.out.println("Invalid input. Please enter a number between 1 and 8.");
                 scanner.next();
                 continue;
             }
@@ -91,7 +89,6 @@ public class Main {
 
             switch (timetableChoice) {
                 case 1:
-                	//adds new timetable
                     System.out.print("Enter day: ");
                     String day = scanner.nextLine().trim();
                     System.out.print("Enter time (00:00 AM): ");
@@ -108,7 +105,6 @@ public class Main {
                     break;
 
                 case 3:
-                	//update a timetable
                     System.out.print("Enter day of event to update: ");
                     String oldDay = scanner.nextLine().trim();
                     System.out.print("Enter time of event to update: ");
@@ -125,7 +121,6 @@ public class Main {
                     break;
 
                 case 4:
-                	//deletes event
                     System.out.print("Enter teacher of event to delete: ");
                     String deleteTeacher = scanner.nextLine().trim();
                     System.out.print("Enter time of event to delete: ");
@@ -134,15 +129,62 @@ public class Main {
                     break;
 
                 case 5:
+                    System.out.print("Enter day for daily summary: ");
+                    String summaryDay = scanner.nextLine().trim();
+                    timetableService.displaySummary(timetableService.getDailySummary(summaryDay));
+                    break;
+
+                case 6:
+                    System.out.println("Weekly Summary:");
+                    timetableService.displaySummary(timetableService.getWeeklySummary());
+                    break;
+
+                case 7:
+                    System.out.println("Monthly Summary:");
+                    timetableService.displaySummary(timetableService.getMonthlySummary());
+                    break;
+                case 8:
+                    exportTimetableData(scanner, timetableService);
+                    break;
+                case 9:
                     System.out.println("Returning to Main Menu...");
                     break;
 
                 default:
                     System.out.println("Invalid choice. Please try again.");
             }
-        } while (timetableChoice != 5);
+        } while (timetableChoice != 9);
     }
+    private static void exportTimetableData(Scanner scanner, TimetableService timetableService) {
+        System.out.println("\n=== || Export Timetable Data || ===");
+        System.out.println("1. Export to Text File");
+        System.out.println("2. Export to CSV File");
+        System.out.print("Enter your choice: ");
 
+        if (!scanner.hasNextInt()) {
+            System.out.println("Error!. Please enter 1 or 2.");
+            scanner.next();
+            return;
+        }
+
+        int exportChoice = scanner.nextInt();
+        scanner.nextLine();
+
+        System.out.print("Enter the file name (including extension, timetable.txt or timetable.csv): ");
+        String exportFileName = scanner.nextLine().trim();
+
+        switch (exportChoice) {
+            case 1:
+                timetableService.exportToTextFile(exportFileName);
+                break;
+            case 2:
+                timetableService.exportToCSVFile(exportFileName);
+                break;
+            default:
+                System.out.println("Please try again.");
+        }
+    }
+                    //ASSIGNMENT MANAGEMENT//
     private static void manageAssignments(Scanner scanner, AssignmentService assignmentService) {
         int assignmentChoice = 5;
         do {
@@ -350,72 +392,5 @@ private static void manageAuthentication(Scanner scanner, AuthenticationService 
         }
     } while (authChoice != 4);
 }
-private static void manageAttendance(Scanner scanner, AttendanceService attendanceService) {
-    int choice = 0;
-    do {
-        System.out.println("\n=== || Attendance Management || ===");
-        System.out.println("1. Mark Attendance");
-        System.out.println("2. View Attendance by Student");
-        System.out.println("3. View Attendance by Date");
-        System.out.println("4. Generate Student Report");
-        System.out.println("5. Generate Date Report");
-        System.out.println("6. Back to Main Menu");
-        System.out.print("Enter your choice: ");
-
-        if (!scanner.hasNextInt()) {
-            System.out.println("Invalid input. Please enter a number.");
-            scanner.next();
-            continue;
-        }
-
-        choice = scanner.nextInt();
-        scanner.nextLine();
-
-        switch (choice) {
-            case 1:
-                System.out.print("Enter student name: ");
-                String student = scanner.nextLine().trim();
-                System.out.print("Enter date (yyyy-mm-dd): ");
-                String date = scanner.nextLine().trim();
-                System.out.print("Is the student present? (true/false): ");
-                boolean present = scanner.nextBoolean();
-                attendanceService.markAttendance(student, date, present);
-                break;
-
-            case 2:
-                System.out.print("Enter student name: ");
-                String studentName = scanner.nextLine().trim();
-                List<Attendance> studentRecords = attendanceService.fetchAttendanceByStudent(studentName);
-                studentRecords.forEach(System.out::println);
-                break;
-
-            case 3:
-                System.out.print("Enter date (yyyy-mm-dd): ");
-                String attendanceDate = scanner.nextLine().trim();
-                List<Attendance> dateRecords = attendanceService.fetchAttendanceByDate(attendanceDate);
-                dateRecords.forEach(System.out::println);
-                break;
-
-            case 4:
-                System.out.print("Enter student name: ");
-                String reportStudent = scanner.nextLine().trim();
-                attendanceService.generateStudentReport(reportStudent);
-                break;
-
-            case 5:
-                System.out.print("Enter date (yyyy-mm-dd): ");
-                String reportDate = scanner.nextLine().trim();
-                attendanceService.generateDateReport(reportDate);
-                break;
-
-            case 6:
-                System.out.println("Returning to Main Menu...");
-                break;
-
-            default:
-                System.out.println("Invalid choice. Please try again.");
-        }
-    } while (choice != 6);
 }
 
-}
