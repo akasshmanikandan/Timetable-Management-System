@@ -24,7 +24,8 @@ public class Main {
             System.out.println("2. Manage Assignments");
             System.out.println("3. Manage Classes");
             System.out.println("4. Manage Authentication");
-            System.out.println("5. Exit");
+            System.out.println("5. View Recurring Events");
+            System.out.println("6. Exit");
             System.out.print("Enter your choice: ");
 
             if (!scanner.hasNextInt()) {
@@ -50,21 +51,24 @@ public class Main {
                     break;
                 case 4:
                     manageAuthentication(scanner, authService);
-                    break;
                 case 5:
+                    manageRecurringEvents(scanner, timetableService);
+                    break;
+
+                case 6:
                     System.out.println("Exiting System.");
                     break;
 
                 default:
                     System.out.println("Please try again.");
             }
-        } while (choice != 5);
+        } while (choice != 6);
 
         scanner.close();
     }
 
     private static void manageTimetable(Scanner scanner, TimetableService timetableService) {
-        int timetableChoice = 8; // Updated to include summary options
+        int timetableChoice = 8; 
         do {
             System.out.println("\n=== || Timetable Management || ===");
             System.out.println("1. Add Timetable Event");
@@ -97,7 +101,9 @@ public class Main {
                     String subject = scanner.nextLine().trim();
                     System.out.print("Enter teacher: ");
                     String teacher = scanner.nextLine().trim();
-                    timetableService.addTimetableEntry(day, time, subject, teacher);
+                    System.out.print("Enter recurrence (Daily, Weekly, Monthly): ");
+                    String recurrence = scanner.nextLine().trim();
+                    timetableService.addTimetableEntry(day, time, subject, teacher, recurrence);
                     break;
 
                 case 2:
@@ -392,5 +398,29 @@ private static void manageAuthentication(Scanner scanner, AuthenticationService 
         }
     } while (authChoice != 4);
 }
+
+private static void manageRecurringEvents(Scanner scanner, TimetableService timetableService) {
+    String recurrenceType;
+
+    do {
+        System.out.println("\n=== || Recurring Events Management || ===");
+        System.out.print("Enter recurrence type (Daily, Weekly, Monthly) or enter Exit");
+        recurrenceType = scanner.nextLine().trim();
+
+        if (recurrenceType.equalsIgnoreCase("Exit")) {
+            System.out.println("Returning to Timetable Menu...");
+            break;
+        }
+
+        if (!recurrenceType.equalsIgnoreCase("Daily") &&
+            !recurrenceType.equalsIgnoreCase("Weekly") &&
+            !recurrenceType.equalsIgnoreCase("Monthly")) {
+            System.out.println("Invalid recurrence type. Please enter 'Daily', 'Weekly', 'Monthly', or 'Exit'.");
+        } else {
+            timetableService.displayRecurringEvents(recurrenceType);
+        }
+    } while (!recurrenceType.equalsIgnoreCase("Exit"));
 }
+}
+
 
