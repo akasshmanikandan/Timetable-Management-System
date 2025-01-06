@@ -11,17 +11,12 @@ public class Timetable implements Serializable {
     private String time;
     private String subject;
     private String teacher;
-    private boolean isRecurring; // Indicates if the event is recurring
-    private String recurrencePattern; // Options: "daily", "weekly"
-
 
     public Timetable(String day, String time, String subject, String teacher) {
         this.day = day;
         this.time = time;
         this.subject = subject;
         this.teacher = teacher;
-        this.isRecurring = isRecurring;
-        this.recurrencePattern = recurrencePattern;
     }
 
     public String getDay() {
@@ -51,7 +46,6 @@ public class Timetable implements Serializable {
     public String getTeacher() {
         return teacher;
     }
-    
 
     public void setTeacher(String teacher) {
         this.teacher = teacher;
@@ -80,8 +74,6 @@ public class Timetable implements Serializable {
                 ", time='" + time + '\'' +
                 ", subject='" + subject + '\'' +
                 ", teacher='" + teacher + '\'' +
-                 ", isRecurring=" + isRecurring +
-            ", recurrencePattern='" + recurrencePattern + '\'' +
                 '}';
     }
 }
