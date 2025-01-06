@@ -8,32 +8,94 @@ import java.util.stream.Collectors;
 
 public class TimetableService {
     private List<Timetable> timetableList;
-    private String fileName; // Custom file name for storing timetable data
+    private String fileName; //custom file 
 
-    // Default constructor uses "timetable_data.ser" for production
+    
     public TimetableService() {
-        this("timetable_data.ser"); // Default to production file
+        this("timetable_data.ser");
     }
 
     // Constructor for custom file (e.g., for testing)
     public TimetableService(String fileName) {
         this.fileName = fileName;
-        this.timetableList = FileHandler.loadFromFile(fileName); // Correct method to load data
+        this.timetableList = FileHandler.loadFromFile(fileName); 
         if (timetableList == null) {
             this.timetableList = new ArrayList<>();
         }
         System.out.println("Timetable data loaded from: " + fileName + ". Current entries: " + timetableList.size());
     }
 
-    // Add a new timetable entry
-    public void addTimetableEntry(String day, String time, String subject, String teacher) {
-        Timetable newEntry = new Timetable(day, time, subject, teacher);
+    // add a new timetable entry
+    public void addTimetableEntry(String day, String time, String subject, String teacher, String recurrence) {
+        Timetable newEntry = new Timetable(day, time, subject, teacher, recurrence);
         timetableList.add(newEntry);
         FileHandler.saveToFile(timetableList, fileName); // Save updated list to file
         System.out.println("Timetable entry added: " + newEntry);
     }
 
-    // Update an existing timetable entry
+    // Add a recurring timetable entry
+    public void addRecurringEvent(String day, String time, String subject, String teacher, String recurrence) {
+        List<String> days = generateRecurringDays(day, recurrence);
+        for (String recurringDay : days) {
+            Timetable recurringEntry = new Timetable(day, time, subject, teacher,recurrence);
+            timetableList.add(recurringEntry);
+        }
+        FileHandler.saveToFile(timetableList, fileName);
+        System.out.println("Recurring timetable entries added for: " + recurrence);
+    }
+
+    // Generate recurring days based on recurrence type
+    private List<String> generateRecurringDays(String day, String recurrence) {
+        List<String> recurringDays = new ArrayList<>();
+        recurringDays.add(day);
+
+        switch (recurrence.toLowerCase()) {
+            case "daily":
+                for (int i = 1; i <= 6; i++) {
+                    recurringDays.add(getNextDay(day, i));
+                }
+                break;
+            case "weekly":
+                for (int i = 1; i <= 3; i++) {
+                    recurringDays.add(getNextDay(day, i * 7));
+                }
+                break;
+            case "monthly":
+                for (int i = 1; i <= 2; i++) {
+                    recurringDays.add("Month+" + i + " " + day); // Placeholder logic for monthly recurrence
+                }
+                break;
+            default:
+                System.out.println("Invalid recurrence type. Supported types: daily, weekly, monthly.");
+        }
+        return recurringDays;
+    }
+
+    // Placeholder for calculating the next day (to be enhanced with proper date handling)
+    private String getNextDay(String currentDay, int offset) {
+        return currentDay + " (+" + offset + " days)";
+    }
+ // Display recurring events based on recurrence type
+    public void displayRecurringEvents(String recurrence) {
+        List<Timetable> recurringEvents = getRecurringEvents(recurrence);
+        if (recurringEvents.isEmpty()) {
+            System.out.println("No recurring events found for recurrence type: " + recurrence);
+        } else {
+            System.out.println("\nRecurring Events (" + recurrence + "):");
+            for (Timetable entry : recurringEvents) {
+                System.out.println(entry);
+            }
+        }
+    }
+ // Get recurring events by recurrence type
+    public List<Timetable> getRecurringEvents(String recurrence) {
+        return timetableList.stream()
+                .filter(entry -> entry.getRecurrence().equalsIgnoreCase(recurrence))
+                .collect(Collectors.toList());
+    }
+
+
+    //update an existing timetable entry
     public void updateTimetableEntry(String day, String time, String newDay, String newTime, String newSubject, String newTeacher) {
         boolean found = false;
 
@@ -56,7 +118,7 @@ public class TimetableService {
         }
     }
 
-    // Delete a timetable entry
+    //deletes  timetable entry
     public void deleteTimetableEntry(String teacher, String time) {
         boolean removed = timetableList.removeIf(entry -> {
             System.out.println("Checking entry: " + entry); // Debug log
@@ -113,7 +175,7 @@ public class TimetableService {
     //export to a CSV file
     public void exportToCSVFile(String exportFileName) {
         try (FileWriter writer = new FileWriter(exportFileName)) {
-            // Write CSV headers
+            
             writer.write("Day,Time,Subject,Teacher\n");
             for (Timetable entry : timetableList) {
                 writer.write(entry.getDay() + "," + entry.getTime() + "," + entry.getSubject() + "," + entry.getTeacher() + "\n");
@@ -137,7 +199,7 @@ public class TimetableService {
         }
     }
 
-    // Get all timetable entries
+    //get all timetable entries
     public List<Timetable> getTimetableEntries() {
         return timetableList;
     }
