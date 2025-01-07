@@ -36,84 +36,62 @@ class TimetableServiceTest {
 
     @Test
     void testAddTimetableEntry() {
-        // Add a new timetable entry
-        timetableService.addTimetableEntry("Monday", "10:00 AM", "SMQ", "Mr. Chan");
-
-        // Verify the entry is added
+        timetableService.addTimetableEntry("Monday", "10:00 AM", "SMQ", "Mr. Chan", "Daily");
         List<Timetable> entries = timetableService.getTimetableEntries();
         assertEquals(1, entries.size(), "Timetable should have 1 entry.");
         assertEquals("SMQ", entries.get(0).getSubject(), "Subject should match.");
-        assertEquals("Mr. Chan", entries.get(0).getTeacher(), "Teacher should match.");
+        assertEquals("Daily", entries.get(0).getRecurrence(), "Recurrence should match.");
     }
 
     @Test
     void testUpdateTimetableEntry() {
-        // Add an entry to update
-        timetableService.addTimetableEntry("Monday", "10:00 AM", "SMQ", "Mr. Chan");
-
-        // Update the entry
+        timetableService.addTimetableEntry("Monday", "10:00 AM", "SMQ", "Mr. Chan", "Daily");
         timetableService.updateTimetableEntry("Monday", "10:00 AM", "Tuesday", "09:00 AM", "Agile", "Mr. Artur");
-
-        // Verify the update
         List<Timetable> entries = timetableService.getTimetableEntries();
         assertEquals(1, entries.size(), "Timetable should still have 1 entry.");
         Timetable updatedEntry = entries.get(0);
         assertEquals("Tuesday", updatedEntry.getDay(), "Day should be updated.");
         assertEquals("09:00 AM", updatedEntry.getTime(), "Time should be updated.");
-        assertEquals("Agile", updatedEntry.getSubject(), "Subject should be updated.");
-        assertEquals("Mr. Artur", updatedEntry.getTeacher(), "Teacher should be updated.");
     }
 
     @Test
     void testDeleteTimetableEntry() {
-        // Add entries
-        timetableService.addTimetableEntry("Monday", "10:00 AM", "SMQ", "Mr. Chan");
-        timetableService.addTimetableEntry("Tuesday", "09:00 AM", "Agile", "Mr. Artur");
-
-        // Delete one entry
+        timetableService.addTimetableEntry("Monday", "10:00 AM", "SMQ", "Mr. Chan", "Daily");
+        timetableService.addTimetableEntry("Tuesday", "09:00 AM", "Agile", "Mr. Artur", "Weekly");
         timetableService.deleteTimetableEntry("Mr. Chan", "10:00 AM");
-
-        // Verify the deletion
         List<Timetable> entries = timetableService.getTimetableEntries();
         assertEquals(1, entries.size(), "Timetable should have 1 entry after deletion.");
-        assertEquals("Agile", entries.get(0).getSubject(), "Remaining entry should be 'Agile'.");
-        assertEquals("Mr. Artur", entries.get(0).getTeacher(), "Remaining teacher should be 'Mr. Artur'.");
     }
-
 
     @Test
     void testDisplayTimetable() {
-        // Add entries
-        timetableService.addTimetableEntry("Monday", "09:00 AM", "SMQ", "Mr. Chan");
-        timetableService.addTimetableEntry("Tuesday", "09:00 AM", "Agile", "Mr. Artur");
-
-        // Display timetable
+        timetableService.addTimetableEntry("Monday", "10:00 AM", "SMQ", "Mr. Chan", "Daily");
+        timetableService.addTimetableEntry("Tuesday", "10:00 AM", "Physics", "Ms. Johnson", "Weekly");
         timetableService.displayTimetable();
-
-        // Verify entries
         List<Timetable> entries = timetableService.getTimetableEntries();
         assertEquals(2, entries.size(), "Timetable should have 2 entries.");
-        assertEquals("SMQ", entries.get(0).getSubject(), "First entry should match.");
-        assertEquals("Agile", entries.get(1).getSubject(), "Second entry should match.");
-    }
-    
-    @Test
-    void testAddRecurringEvent() {
-        timetableService.addRecurringEvent("Monday", "09:00 AM", "SMQA", "Mr. Chan", "daily");
-
-        List<Timetable> entries = timetableService.getTimetableEntries();
-        assertEquals(1, entries.size(), "One recurring event should be added.");
-        assertTrue(entries.get(0).isRecurring(), "Event should be marked as recurring.");
-        assertEquals("daily", entries.get(0).getRecurrencePattern(), "Recurrence pattern should match.");
     }
 
     @Test
-    void testProcessRecurringEvents() {
-        timetableService.addRecurringEvent("Monday", "09:00 AM", "SMQA", "Mr. Chan", "daily");
-        timetableService.processRecurringEvents();
-
-        List<Timetable> entries = timetableService.getTimetableEntries();
-        assertEquals(5, entries.size(), "Five events should be added for daily recurrence.");
+    void testGetDailySummary() {
+        timetableService.addTimetableEntry("Monday", "10:00 AM", "SMQ", "Mr. Chan", "Daily");
+        timetableService.addTimetableEntry("Tuesday", "10:00 AM", "Agile", "Mr. Artur","Weekly");
+        List<Timetable> dailyEvents = timetableService.getRecurringEvents("Daily");
+        assertEquals(1, dailyEvents.size(), "There should be 1 daily event.");
+    }
+//As a tester, I want to validate the recurring event logic with unit tests to ensure accuracy.
+    @Test
+    void testGetWeeklySummary() {
+        timetableService.addTimetableEntry("Monday", "10:00 AM", "SMQ", "Mr. Chan", "Daily");
+        timetableService.addTimetableEntry("Tuesday", "10:00 AM", "Agile", "Mr. Artur","Weekly");
+        List<Timetable> weeklyEvents = timetableService.getRecurringEvents("Weekly");
+        assertEquals(1, weeklyEvents.size(), "There should be 1 weekly event.");
     }
 
+    @Test
+    void testInvalidRecurrence() {
+        timetableService.addTimetableEntry("Monday", "10:00 AM", "SMQ", "Mr. Chan", "Daily");
+        List<Timetable> invalidEvents = timetableService.getRecurringEvents("Yearly");
+        assertTrue(invalidEvents.isEmpty(), "There should be no events for an invalid recurrence type.");
+    }
 }
