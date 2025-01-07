@@ -3,6 +3,7 @@ package timetable.assignmet;
 import timetable.FileHandler;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 public class AssignmentService {
@@ -25,22 +26,6 @@ public class AssignmentService {
         FileHandler.saveToFile(assignmentList, storageFileName); // Generic save method
         System.out.println("Assignment added successfully: " + newAssignment);
     }
-    public void calculateProgress(String title, int completedTasks, int totalTasks) {
-        for (Assignment assignment : assignmentList) {
-            if (assignment.getTitle().equalsIgnoreCase(title)) {
-                assignment.setProgress((completedTasks * 100) / totalTasks);
-                FileHandler.saveToFile(assignmentList, storageFileName);
-                System.out.println("Progress updated for assignment: " + title);
-                return;
-            }
-        }
-        System.out.println("Error: Assignment not found.");
-    }
-    public void markAsComplete(String title) {
-        calculateProgress(title, 1, 1);
-        System.out.println("Assignment marked as complete: " + title);
-    }
-
 
     // Update an existing assignment
     public void updateAssignment(String oldTitle, String newTitle, String newDescription, String newDeadline, String newPriority) {
@@ -76,6 +61,60 @@ public class AssignmentService {
             System.out.println("Error: No matching assignment found to delete.");
         }
     }
+    //assignment progress
+    public void updateAssignmentProgress(String title, int completionPercentage) {
+        for (Assignment assignment : assignmentList) {
+            if (assignment.getTitle().equalsIgnoreCase(title)) {
+                assignment.setCompletionPercentage(completionPercentage);
+                FileHandler.saveToFile(assignmentList, storageFileName); // Save updated progress
+                System.out.println("Progress updated for assignment: " + title);
+                return;
+            }
+        }
+        System.out.println("Error: No matching assignment found to update progress.");
+    }
+
+    // Calculate overall completion progress
+    public double calculateOverallProgress() {
+        if (assignmentList.isEmpty()) {
+            System.out.println("No assignments available to calculate progress.");
+            return 0.0;
+        }
+
+        int totalProgress = assignmentList.stream()
+                .mapToInt(Assignment::getCompletionPercentage)
+                .sum();
+
+        return (double) totalProgress / assignmentList.size();
+    }
+    
+    // Retrieve assignments sorted by priority
+    public List<Assignment> getAssignmentsSortedByPriority() {
+        List<Assignment> sortedList = new ArrayList<>(assignmentList);
+        sortedList.sort(Comparator.comparing(Assignment::getPriority));
+        return sortedList;
+    }
+
+    // Retrieve assignments sorted by deadline
+    public List<Assignment> getAssignmentsSortedByDeadline() {
+        List<Assignment> sortedList = new ArrayList<>(assignmentList);
+        sortedList.sort(Comparator.comparing(Assignment::getDeadline));
+        return sortedList;
+    }
+
+    // Display sorted assignments
+    public void displaySortedAssignments(List<Assignment> sortedList) {
+        if (sortedList.isEmpty()) {
+            System.out.println("No assignments found.");
+            return;
+        }
+
+        System.out.println("\nSorted Assignment List:");
+        for (Assignment assignment : sortedList) {
+            System.out.println(assignment);
+        }
+    }
+
 
     // Display all assignments
     public void displayAssignments() {
@@ -89,22 +128,23 @@ public class AssignmentService {
             System.out.println(assignment);
         }
     }
+    //display assignments sorted by priority
+    public void displaySortedAssignmentsByPriority() {
+        assignmentList.stream()
+                .sorted(Comparator.comparing(Assignment::getPriority))
+                .forEach(System.out::println);
+    }
+
+    //display assignments sorted by deadline
+    public void displaySortedAssignmentsByDeadline() {
+        assignmentList.stream()
+                .sorted(Comparator.comparing(Assignment::getDeadline))
+                .forEach(System.out::println);
+    }
+
 
     // Get all assignments
     public List<Assignment> getAssignments() {
         return assignmentList;
-        
     }
-    public List<Assignment> sortByPriority() {
-        return assignmentList.stream()
-            .sorted((a1, a2) -> a1.getPriority().compareToIgnoreCase(a2.getPriority()))
-            .collect(Collectors.toList());
-    }
-
-    public List<Assignment> sortByDeadline() {
-        return assignmentList.stream()
-            .sorted((a1, a2) -> a1.getDeadline().compareTo(a2.getDeadline()))
-            .collect(Collectors.toList());
-    }
-
 }
