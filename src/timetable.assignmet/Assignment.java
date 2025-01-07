@@ -7,16 +7,13 @@ public class Assignment implements Serializable {
     private String description;
     private String deadline;
     private String priority;
-    private int progress; // Progress percentage (0-100)
-
-    
-
+    private int completionPercentage;
     public Assignment(String title, String description, String deadline, String priority) {
         this.title = title;
         this.description = description;
         this.deadline = deadline;
         this.priority = priority;
-        this.progress = progress;
+        this.completionPercentage = 0; 
     }
 
     public String getTitle() {
@@ -50,15 +47,11 @@ public class Assignment implements Serializable {
     public void setPriority(String priority) {
         this.priority = priority;
     }
-    public int getProgress() {
-        return progress;
+
+    public int getCompletionPercentage() { return completionPercentage; }
+    public void setCompletionPercentage(int completionPercentage) {
+        this.completionPercentage = Math.max(0, Math.min(100, completionPercentage)); // Ensure valid range
     }
-
-    public void setProgress(int progress) {
-        this.progress = progress;
-    }
-
-
     @Override
     public String toString() {
         return "Assignment{" +
@@ -66,6 +59,7 @@ public class Assignment implements Serializable {
                 ", description='" + description + '\'' +
                 ", deadline='" + deadline + '\'' +
                 ", priority='" + priority + '\'' +
+                 ", completionPercentage=" + completionPercentage + "%" +
                 '}';
     }
 }
