@@ -192,18 +192,21 @@ public class Main {
     }
                     //ASSIGNMENT MANAGEMENT//
     private static void manageAssignments(Scanner scanner, AssignmentService assignmentService) {
-        int assignmentChoice = 5;
+        int assignmentChoice = 8; 
         do {
             System.out.println("\n=== || Assignment Management || ===");
             System.out.println("1. Add Assignment");
             System.out.println("2. View Assignments");
             System.out.println("3. Update Assignment");
             System.out.println("4. Delete Assignment");
-            System.out.println("5. Back to Main Menu");
+            System.out.println("5. Update Assignment Progress");
+            System.out.println("6. View Assignments Sorted by Priority");
+            System.out.println("7. View Assignments Sorted by Deadline");
+            System.out.println("8. Back to Main Menu");
             System.out.print("Enter your choice: ");
 
             if (!scanner.hasNextInt()) {
-                System.out.println("Invalid! Please enter a number between 1 and 5.");
+                System.out.println("Invalid! Please enter a number between 1 and 8.");
                 scanner.next();
                 continue;
             }
@@ -213,7 +216,6 @@ public class Main {
 
             switch (assignmentChoice) {
                 case 1:
-                	// adds new assisgnment
                     System.out.print("Enter assignment title: ");
                     String title = scanner.nextLine().trim();
                     System.out.print("Enter description: ");
@@ -230,7 +232,6 @@ public class Main {
                     break;
 
                 case 3:
-                	//update a assignment
                     System.out.print("Enter title of assignment to update: ");
                     String oldTitle = scanner.nextLine().trim();
                     System.out.print("Enter new title: ");
@@ -245,20 +246,39 @@ public class Main {
                     break;
 
                 case 4:
-                	//delete assignment
                     System.out.print("Enter title of assignment to delete: ");
                     String deleteTitle = scanner.nextLine().trim();
                     assignmentService.deleteAssignment(deleteTitle);
                     break;
 
                 case 5:
+                    System.out.print("Enter title of assignment to update progress: ");
+                    String progressTitle = scanner.nextLine().trim();
+                    System.out.print("Enter completion percentage (0-100): ");
+                    int completion = scanner.nextInt();
+                    scanner.nextLine(); // Consume newline
+                    assignmentService.updateAssignmentProgress(progressTitle, completion);
+                    break;
+                case 6:
+                    //assignments sorted by priority
+                    System.out.println("\nAssignments Sorted by Priority:");
+                    assignmentService.displaySortedAssignmentsByPriority();
+                    break;
+
+                case 7:
+                    //assignments sorted by deadline
+                    System.out.println("\nAssignments Sorted by Deadline:");
+                    assignmentService.displaySortedAssignmentsByDeadline();
+                    break;
+
+                case 8:
                     System.out.println("Returning to Main Menu...");
                     break;
 
                 default:
                     System.out.println("Invalid choice. Please try again.");
             }
-        } while (assignmentChoice != 5);
+        } while (assignmentChoice != 8);
     }
 
     private static void manageClasses(Scanner scanner, ClassManagementService classService) {
