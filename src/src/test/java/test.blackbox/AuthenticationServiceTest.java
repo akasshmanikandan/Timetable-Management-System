@@ -56,4 +56,23 @@ class AuthenticationServiceTest {
         boolean isAccessGranted = false; 
         assertFalse(isAccessGranted, "Access should be denied without login.");
     }
+    @Test
+    void testDuplicateRegistration() {
+        authService.register("nbv3", "naga123");
+
+        // Attempt to register the same username again
+        boolean isRegistered = authService.register("nbv3", "newpassword");
+        assertFalse(isRegistered, "Duplicate registration should not be allowed.");
+    }
+
+@Test
+void testPasswordChange() {
+    authService.register("nbv3", "naga123");
+
+    // Change the password and verify login with the new password
+    boolean isPasswordChanged = authService.changePassword("nbv3", "naga123", "newpassword");
+    assertTrue(isPasswordChanged, "Password change should be successful.");
+    assertTrue(authService.login("nbv3", "newpassword"), "Login should be successful with the new password.");
+    assertFalse(authService.login("nbv3", "naga123"), "Login should fail with the old password.");
+}
 }
