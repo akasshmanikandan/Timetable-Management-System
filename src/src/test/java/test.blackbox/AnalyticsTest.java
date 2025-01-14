@@ -125,4 +125,24 @@ void testWeeklyUtilizationPercentage() {
     assertTrue(utilizationPercentage > 0, "Weekly utilization percentage should be greater than 0.");
     System.out.printf("Weekly Utilization: %.2f%%\n", utilizationPercentage);
 }
+@Test
+void testNoOverdueAssignments() {
+    // Add assignments with future deadlines
+    assignmentService.addAssignment("Assignment 1", "Description 1", "2025-01-20", "Medium");
+    assignmentService.addAssignment("Assignment 2", "Description 2", "2025-01-25", "High");
+
+    // Validate no overdue assignments
+    List<Assignment> overdue = assignmentService.getOverdueAssignments();
+    assertTrue(overdue.isEmpty(), "There should be no overdue assignments.");
+}
+@Test
+void testTimeUtilizationMultipleDays() {
+    // Add timetable entries for different days
+    timetableService.addTimetableEntry("Monday", "09:00", "Math", "Mr. Smith", "Daily", 60);
+    timetableService.addTimetableEntry("Tuesday", "10:30", "Science", "Ms. Johnson", "Weekly", 90);
+
+    // Validate total utilized time
+    long totalMinutes = timetableService.calculateUtilizedTime();
+    assertEquals(120, totalMinutes, "Total utilized time should be 120 minutes.");
+}
 }
