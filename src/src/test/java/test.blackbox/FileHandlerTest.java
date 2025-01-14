@@ -7,6 +7,8 @@ import timetable.FileHandler;
 import timetable.Timetable;
 
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,8 +40,8 @@ public class FileHandlerTest {
     void testSaveAndLoadTimetable() {
         // creating a sample timetable list
         List<Timetable> timetableList = new ArrayList<>();
-        timetableList.add(new Timetable("Monday", "11:00 AM", "ServiceDesign", "DR. Genovefa"));
-        timetableList.add(new Timetable("Tuesday", "10:00 AM", "SOA", "Mr.Reiko"));
+        timetableList.add(new Timetable("Monday", "11:00 AM", "ServiceDesign", "DR. Genovefa","None", 12));
+        timetableList.add(new Timetable("Tuesday", "10:00 AM", "SOA", "Mr.Reiko","None",15));
 
         //save to and load from the test file
         FileHandler.saveToFile(timetableList, TEST_FILE);
@@ -83,7 +85,7 @@ public class FileHandlerTest {
     void testOverwriteFile() {
         //create an initial timetable entries
         List<Timetable> initialList = new ArrayList<>();
-        initialList.add(new Timetable("Monday", "11:00 AM", "ServiceDesign", "DR. Genovefa"));
+        initialList.add(new Timetable("Monday", "11:00 AM", "ServiceDesign", "DR. Genovefa","None", 15));
 
         //saves initial list to the test file
         FileHandler.saveToFile(initialList, TEST_FILE);
@@ -94,7 +96,7 @@ public class FileHandlerTest {
 
         //overwrite with a new timetable list
         List<Timetable> newList = new ArrayList<>();
-        newList.add(new Timetable("Tuesday", "10:00 AM", "SOA", "Mr.Reiko"));
+        newList.add(new Timetable("Tuesday", "10:00 AM", "SOA", "Mr.Reiko","None",13));
         FileHandler.saveToFile(newList, TEST_FILE);
 
         //verifys overwrite
@@ -102,5 +104,17 @@ public class FileHandlerTest {
         assertEquals(newList.size(), loadedList.size(), "Overwrite save should have one entry.");
         assertEquals("SOA", loadedList.get(0).getSubject(), "Loaded subject should match new save.");
     }
-}
 
+    @Test
+    void testSaveAndLoadWithSpecialCharacters() {
+        List<Timetable> specialCharList = new ArrayList<>();
+        specialCharList.add(new Timetable("Monday", "11:00 AM", "Math&Science", "Dr. Smith@Uni", "None", 10));
+        FileHandler.saveToFile(specialCharList, TEST_FILE);
+
+        List<Timetable> loadedList = FileHandler.loadFromFile(TEST_FILE);
+        assertNotNull(loadedList, "Loaded list should not be null.");
+        assertEquals(1, loadedList.size(), "Loaded list should contain one entry.");
+        assertEquals("Math&Science", loadedList.get(0).getSubject(), "Subject should match special characters.");
+        assertEquals("Dr. Smith@Uni", loadedList.get(0).getTeacher(), "Teacher name should match special characters.");
+    }
+}
