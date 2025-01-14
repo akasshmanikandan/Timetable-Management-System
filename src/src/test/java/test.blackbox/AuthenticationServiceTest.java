@@ -75,4 +75,27 @@ void testPasswordChange() {
     assertTrue(authService.login("nbv3", "newpassword"), "Login should be successful with the new password.");
     assertFalse(authService.login("nbv3", "naga123"), "Login should fail with the old password.");
 }
+@Test
+void testPasswordChangeWithIncorrectOldPassword() {
+    authService.register("user1", "password123");
+    assertFalse(authService.changePassword("user1", "wrongpassword", "newpassword"), "Password change should fail with incorrect old password.");
+}
+@Test
+void testDeleteUser() {
+    authService.register("user1", "password123");
+    assertTrue(authService.deleteUser("user1"), "User should be deleted successfully.");
+    assertFalse(authService.login("user1", "password123"), "Login should fail for a deleted user.");
+}
+@Test
+void testDeleteNonExistentUser() {
+    assertFalse(authService.deleteUser("nonExistentUser"), "Deleting a non-existent user should return false.");
+}
+
+// New Test Case 2: Case-insensitive login
+@Test
+void testCaseInsensitiveLogin() {
+    authService.register("User123", "password123");
+    assertTrue(authService.login("user123", "password123"), "Login should be case-insensitive for usernames.");
+    assertTrue(authService.login("USER123", "password123"), "Login should be case-insensitive for usernames.");
+}
 }
