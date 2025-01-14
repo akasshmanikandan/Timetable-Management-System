@@ -97,4 +97,32 @@ class AnalyticsTest {
         long totalMinutes = timetableService.calculateUtilizedTime();
         assertEquals(120, totalMinutes, "Total utilized time should be 120 minutes.");
     }
+
+@Test
+void testHighPriorityAssignments() {
+    // Add sample data
+    assignmentService.addAssignment("Project Report", "Final report submission", "2025-01-15", "High");
+    assignmentService.addAssignment("Lab Work", "Physics lab experiment", "2025-01-10", "Low");
+    assignmentService.addAssignment("Presentation", "Project presentation", "2025-01-12", "High");
+
+    // Filter high-priority assignments
+    List<Assignment> highPriorityAssignments = assignmentService.getAssignmentsSortedByPriority().stream()
+            .filter(a -> a.getPriority().equalsIgnoreCase("High"))
+            .toList();
+
+    assertEquals(2, highPriorityAssignments.size(), "There should be 2 high-priority assignments.");
+    assertTrue(highPriorityAssignments.stream().anyMatch(a -> a.getTitle().equals("Project Report")));
+    assertTrue(highPriorityAssignments.stream().anyMatch(a -> a.getTitle().equals("Presentation")));
+}
+@Test
+void testWeeklyUtilizationPercentage() {
+    // Sample data
+    timetableService.addTimetableEntry("Monday", "09:00", "Math", "Mr. Smith", "Daily", 15);
+    timetableService.addTimetableEntry("Wednesday", "11:00", "Science", "Ms. Johnson", "Weekly", 20);
+
+    // Validate weekly utilization
+    double utilizationPercentage = timetableService.calculateWeeklyUtilization();
+    assertTrue(utilizationPercentage > 0, "Weekly utilization percentage should be greater than 0.");
+    System.out.printf("Weekly Utilization: %.2f%%\n", utilizationPercentage);
+}
 }
