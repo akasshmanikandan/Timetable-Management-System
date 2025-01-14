@@ -11,7 +11,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 class ExportTimetableDataTest {
 
@@ -21,16 +21,13 @@ class ExportTimetableDataTest {
     @BeforeEach
     void setUp() {
         timetableService = new TimetableService("export_timetable_data.ser");
-        timetableService.addTimetableEntry("Monday", "09:00 AM", "Math", "Mr. Smith");
-        timetableService.addTimetableEntry("Tuesday", "10:00 AM", "Science", "Ms. Johnson");
+        timetableService.addTimetableEntry("Monday", "09:00", "Math", "Mr. Smith", "Daily", 10);
+        timetableService.addTimetableEntry("Tuesday", "10:00", "Science", "Ms. Johnson", "Daily", 10);
     }
 
     @AfterEach
     void tearDown() {
-        // Delete the test files after each test
         File csv = new File(csvFile);
-
-
         if (csv.exists() && csv.delete()) {
             System.out.println("Deleted file: " + csvFile);
         } else {
@@ -40,7 +37,8 @@ class ExportTimetableDataTest {
 
     @Test
     void testExportToCSVFile() throws IOException {
-        timetableService.exportToCSVFile(csvFile);
+        File csvFile = new File("test_output.csv");
+        timetableService.exportToCSVFile(csvFile.getAbsolutePath());
 
         try (BufferedReader reader = new BufferedReader(new FileReader(csvFile))) {
             String header = reader.readLine();
@@ -48,8 +46,30 @@ class ExportTimetableDataTest {
             String line2 = reader.readLine();
 
             assertEquals("Day,Time,Subject,Teacher", header, "Header should match.");
-            assertEquals("Monday,09:00 AM,Math,Mr. Smith", line1, "First row should match.");
-            assertEquals("Tuesday,10:00 AM,Science,Ms. Johnson", line2, "Second row should match.");
+            assertEquals("Monday,09:00,Math,Mr. Smith", line1, "First row should match.");
+            assertEquals("Tuesday,10:00,Science,Ms. Johnson", line2, "Second row should match.");
+        } catch (IOException e) {
+            fail("Failed to read the CSV file: " + e.getMessage());
         }
     }
+
+    @Test
+    void testExportEmptyTimetable() {
+        timetableService = new TimetableService("empty_timetable.ser");
+        File csvFile = new File("empty_timetable.csv");
+
+        timetableService.exportToCSVFile(csvFile.getAbsolutePath());
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(csvFile))) {
+            String header = reader.readLine();
+            String line = reader.readLine();
+
+            assertEquals("Day,Time,Subject,Teacher", header, "Header should match.");
+            assertNull(line, "There should be no entries in the CSV for an empty timetable.");
+        } catch (IOException e) {
+            fail("Failed to read the CSV file: " + e.getMessage());
+        }
+    }
+
+    
 }
