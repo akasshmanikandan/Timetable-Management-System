@@ -52,6 +52,7 @@ class ExportTimetableDataTest {
             fail("Failed to read the CSV file: " + e.getMessage());
         }
     }
+   
 
     @Test
     void testExportEmptyTimetable() {
@@ -70,6 +71,4 @@ class ExportTimetableDataTest {
             fail("Failed to read the CSV file: " + e.getMessage());
         }
     }
-
-    
 }
