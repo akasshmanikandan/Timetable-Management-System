@@ -1,4 +1,4 @@
-package timetable.attendance;
+package timetable.Attendance;
 
 import timetable.FileHandler;
 import java.util.ArrayList;
@@ -6,85 +6,108 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class AttendanceService {
-    private List<Attendance> attendanceList; // List to hold attendance records
-    private String fileName; // File name for serialized attendance data
-
-    // Constructor to load attendance data from a file
-    public AttendanceService(String fileName) {
-        this.fileName = fileName;
-        this.attendanceList = FileHandler.loadFromFile(fileName);
+    private List<attendance> attendanceList;
+    private String storageFileName;
+    public AttendanceService(String storageFileName) {
+        this.storageFileName = storageFileName;
+        this.attendanceList = FileHandler.loadFromFile(storageFileName);
         if (attendanceList == null) {
             this.attendanceList = new ArrayList<>();
         }
-        System.out.println("Attendance data loaded from: " + fileName);
+        System.out.println("Attendance data loaded from: " + storageFileName + ". Current records: " + attendanceList.size());
     }
 
-    // Method to mark attendance for a student
-    public void markAttendance(String student, String date, boolean present) {
-        Attendance attendance = new Attendance(student, date, present);
-        attendanceList.add(attendance);
-        FileHandler.saveToFile(attendanceList, fileName); // Save to file
-        System.out.println("Attendance marked for: " + student + " on " + date);
+    //add a new attendance record
+    public void addAttendance(String studentName, String className, String date, boolean isPresent) {
+        attendance newAttendance = new attendance(studentName, className, date, isPresent);
+        attendanceList.add(newAttendance);
+        FileHandler.saveToFile(attendanceList, storageFileName);
+        System.out.println("Attendance added: " + newAttendance);
     }
 
-    // Method to fetch attendance records for a specific student
-    public List<Attendance> fetchAttendanceByStudent(String student) {
-        return attendanceList.stream()
-            .filter(record -> record.getStudent().equalsIgnoreCase(student))
-            .collect(Collectors.toList());
-    }
+    //update an existing attendance record
+    public void updateAttendance(String studentName, String className, String date, boolean isPresent) {
+        boolean found = false;
 
-    // Method to fetch attendance records for a specific date
-    public List<Attendance> fetchAttendanceByDate(String date) {
-        return attendanceList.stream()
-            .filter(record -> record.getDate().equalsIgnoreCase(date))
-            .collect(Collectors.toList());
+        for (attendance record : attendanceList) {
+            if (record.getStudentName().equalsIgnoreCase(studentName) &&
+                record.getClassName().equalsIgnoreCase(className) &&
+                record.getDate().equals(date)) {
+                record.setPresent(isPresent);
+                found = true;
+                break;
+            }
+        }
+        if (found) {
+            FileHandler.saveToFile(attendanceList, storageFileName);
+            System.out.println("Attendance updated for: " + studentName + " in class " + className);
+        } else {
+            System.out.println("Error: No matching attendance record found to update.");
+        }
     }
-
-    // Method to generate attendance report for a student
-    public void generateStudentReport(String student) {
-        List<Attendance> studentRecords = fetchAttendanceByStudent(student);
+    
+    //method to mark attendance
+    public void markAttendance(String studentName, String className, String date, boolean isPresent) {
+        attendance record = new attendance(studentName, className, date, isPresent);
+        attendanceList.add(record);
+        FileHandler.saveToFile(attendanceList, storageFileName); // Save updated list
+        System.out.println("Attendance marked for student: " + studentName + " in class: " + className);
+    }
+    public double calculateAttendancePercentage(String studentName) {
+        List<attendance> studentRecords = getAttendanceByStudent(studentName);
         if (studentRecords.isEmpty()) {
-            System.out.println("No attendance records found for student: " + student);
+            return 0.0; // No attendance records, return 0%
+        }
+
+        long presentCount = studentRecords.stream()
+        .filter(attendance::isPresent)
+        .count();
+        return (double) presentCount / studentRecords.size() * 100;
+    }
+   
+
+    //fetch attendance report by student
+    public List<attendance> getAttendanceByStudent(String studentName) {
+        return attendanceList.stream()
+                .filter(record -> record.getStudentName().equalsIgnoreCase(studentName))
+                .collect(Collectors.toList());
+    }
+
+    //fetch attendance report by class
+    public List<attendance> getAttendanceByClass(String className) {
+        return attendanceList.stream()
+                .filter(record -> record.getClassName().equalsIgnoreCase(className))
+                .collect(Collectors.toList());
+    }
+
+    //display filtered attendance records
+    public void displayFilteredAttendance(List<attendance> filteredRecords) {
+        if (filteredRecords.isEmpty()) {
+            System.out.println("No matching attendance records found.");
         } else {
-            System.out.println("Attendance Report for " + student + ":");
-            studentRecords.forEach(record -> {
-                System.out.println("Date: " + record.getDate() + ", Present: " + record.isPresent());
-            });
+            System.out.println("\nFiltered Attendance Records:");
+            for (attendance record : filteredRecords) {
+                System.out.println(record);
+            }
         }
     }
 
-    // Method to generate attendance report for all students on a specific date
-    public void generateDateReport(String date) {
-        List<Attendance> dateRecords = fetchAttendanceByDate(date);
-        if (dateRecords.isEmpty()) {
-            System.out.println("No attendance records found for date: " + date);
-        } else {
-            System.out.println("Attendance Report for " + date + ":");
-            dateRecords.forEach(record -> {
-                System.out.println("Student: " + record.getStudent() + ", Present: " + record.isPresent());
-            });
-        }
-    }
-    public void generateClassReport(String date) {
-        List<Attendance> records = fetchAttendanceByDate(date);
-        if (records.isEmpty()) {
-            System.out.println("No attendance records found for " + date);
-        } else {
-            System.out.println("Attendance Report for " + date + ":");
-            records.forEach(record -> {
-                System.out.println("Student: " + record.getStudent() + ", Present: " + record.isPresent());
-            });
-        }
-    }
 
-    // Method to display all attendance records
-    public void displayAllAttendance() {
+    //display all attendance records
+    public void displayAttendance() {
         if (attendanceList.isEmpty()) {
-            System.out.println("No attendance records available.");
-        } else {
-            System.out.println("All Attendance Records:");
-            attendanceList.forEach(System.out::println);
+            System.out.println("No attendance records found.");
+            return;
         }
+
+        System.out.println("\nAttendance Records:");
+        for (attendance record : attendanceList) {
+            System.out.println(record);
+        }
+    }
+
+    //get all attendance records
+    public List<attendance> getAttendanceList() {
+        return attendanceList;
     }
 }
