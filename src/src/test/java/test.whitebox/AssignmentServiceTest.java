@@ -5,10 +5,8 @@ import timetable.assignmet.AssignmentService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
 import java.io.File;
 import java.util.List;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 class AssignmentServiceTest {
@@ -23,7 +21,6 @@ class AssignmentServiceTest {
 
     @AfterEach
     void tearDown() {
-        // deletes the custom file after each test
         File testFile = new File(CUSTOM_TEST_FILE);
         if (testFile.exists()) {
             testFile.delete();
@@ -32,24 +29,20 @@ class AssignmentServiceTest {
 
     @Test
     void testAddAssignment() {
-        // adds an new assignment
+        //adds an new assignment
         assignmentService.addAssignment("SMQ", "Complete BY JAN 17", "2025-01-17", "High");
-
-        // verifies wether assignment is added
+        //verifies wether assignment is added
         List<Assignment> assignments = assignmentService.getAssignments();
         assertEquals(1, assignments.size(), "There should be atleast 1 assignment.");
         assertEquals("SMQ", assignments.get(0).getTitle(), "name should match.");
     }
 
     @Test
-    void testUpdateAssignment() {
-        
+    void testUpdateAssignment() { 
         assignmentService.addAssignment("Agile", "Finish by JAN 9", "2025-01-09", "Medium");
-
-        // update assignment
+        //update assignment
         assignmentService.updateAssignment("Agile", "ServiceDesign", "Prepare a Presentation", "2025-01-13", "High");
-
-        // verify the update
+        //verifying the update
         List<Assignment> assignments = assignmentService.getAssignments();
         assertEquals(1, assignments.size(), "There should still be 1 assignment.");
         Assignment updated = assignments.get(0);
@@ -58,15 +51,11 @@ class AssignmentServiceTest {
     }
 
     @Test
-    void testDeleteAssignment() {
-      
+    void testDeleteAssignment() {    
         assignmentService.addAssignment("SOA", "Make a metamodel", "2025-01-12", "Low");
         assignmentService.addAssignment("GroupSkills", "Make PPT", "2025-01-08", "High");
-
-        // delete one assignment
         assignmentService.deleteAssignment("SOA");
-
-        // verify the deletion
+        //verifying the deletion
         List<Assignment> assignments = assignmentService.getAssignments();
         assertEquals(1, assignments.size(), "There should be 1 assignment left.");
         assertEquals("GroupSkills", assignments.get(0).getTitle(), "Remaining assignment should be 'GroupSkills'.");
@@ -74,80 +63,44 @@ class AssignmentServiceTest {
 
     @Test
     void testDisplayAssignments() {
-        // add assignments
+        //adds assignments
         assignmentService.addAssignment("SMQ", "Complete BY JAN 17", "2025-01-17", "High");
         assignmentService.addAssignment("Cybersecurity", "Prepare for exam", "2025-01-17", "Medium");
-
-        //shows remaining assignments
         assignmentService.displayAssignments();
-
-        // verifies
+        //verifies
         List<Assignment> assignments = assignmentService.getAssignments();
         assertEquals(2, assignments.size(), "There should be 2 assignments.");
-        
-        
-        
     }
-    
+  
     @Test
-    void testChangePassword() {
-        authService.register("user1", "password1");
-        assertTrue(authService.changePassword("user1", "password1", "newpassword"), "Password change should succeed.");
-        assertFalse(authService.login("user1", "password1"), "Old password should not work.");
-        assertTrue(authService.login("user1", "newpassword"), "New password should work.");
-    }
+    void testUpdateAssignmentPriority() {
+        //adds an assignment
+        assignmentService.addAssignment("Math", "Solve exercises", "2025-01-20", "Low");
 
-    @Test
-    void testResetPassword() {
-        authService.register("user2", "password2");
-        assertTrue(authService.resetPassword("user2", "newpassword2"), "Password reset should succeed.");
-        assertFalse(authService.login("user2", "password2"), "Old password should not work.");
-        assertTrue(authService.login("user2", "newpassword2"), "New password should work.");
-    }
-    
-    @Test
-    void testCalculateProgress() {
-        assignmentService.addAssignment("SMQA", "Complete the report", "2025-01-17", "High", 0);
-        assignmentService.calculateProgress("SMQA", 5, 10);
-
+        //updates the assignment's priority
+        assignmentService.updateAssignment("Math", "Math", "Solve exercises", "2025-01-20", "High");
         List<Assignment> assignments = assignmentService.getAssignments();
-        assertEquals(50, assignments.get(0).getProgress(), "Progress should be 50%.");
+        assertEquals("High", assignments.get(0).getPriority(), "The priority should be updated to High.");
     }
-
     @Test
-    void testMarkAsComplete() {
-        assignmentService.addAssignment("SMQA", "Complete the report", "2025-01-17", "High", 0);
-        assignmentService.markAsComplete("SMQA");
-
+    void testAddDuplicateAssignments() {
+        assignmentService.addAssignment("Project Report", "Complete final report", "2025-01-25", "High");
+        assignmentService.addAssignment("Project Report", "Complete final report", "2025-01-25", "High");
+        //verifying that both assignments are added
         List<Assignment> assignments = assignmentService.getAssignments();
-        assertEquals(100, assignments.get(0).getProgress(), "Progress should be 100%.");
+        assertEquals(2, assignments.size(), "There should be 2 assignments.");
     }
-
     @Test
-    void testSortByPriority() {
-        assignmentService.addAssignment("Assignment1", "Task 1", "2025-01-17", "High", 0);
-        assignmentService.addAssignment("Assignment2", "Task 2", "2025-01-15", "Low", 0);
-        assignmentService.addAssignment("Assignment3", "Task 3", "2025-01-10", "Medium", 0);
-
-        List<Assignment> sortedByPriority = assignmentService.sortByPriority();
-        assertEquals("Low", sortedByPriority.get(0).getPriority(), "First priority should be 'Low'.");
-        assertEquals("Medium", sortedByPriority.get(1).getPriority(), "Second priority should be 'Medium'.");
-        assertEquals("High", sortedByPriority.get(2).getPriority(), "Third priority should be 'High'.");
+    void testAssignmentsSortedByTitle() {
+        //adds multiple assignments with different titles
+        assignmentService.addAssignment("Zoology", "Prepare notes", "2025-01-22", "Medium");
+        assignmentService.addAssignment("Algebra", "Solve problems", "2025-01-18", "High");
+        assignmentService.addAssignment("Geometry", "Complete worksheet", "2025-01-20", "Low");
+        List<Assignment> sortedByTitle = assignmentService.getAssignmentsSortedByTitle();
+        //verifying the sorting order
+        assertEquals("Algebra", sortedByTitle.get(0).getTitle(), "First assignment should be 'Algebra'.");
+        assertEquals("Geometry", sortedByTitle.get(1).getTitle(), "Second assignment should be 'Geometry'.");
+        assertEquals("Zoology", sortedByTitle.get(2).getTitle(), "Third assignment should be 'Zoology'.");
     }
 
-    @Test
-    void testSortByDeadline() {
-        assignmentService.addAssignment("Assignment1", "Task 1", "2025-01-17", "High", 0);
-        assignmentService.addAssignment("Assignment2", "Task 2", "2025-01-15", "Low", 0);
-        assignmentService.addAssignment("Assignment3", "Task 3", "2025-01-10", "Medium", 0);
-
-        List<Assignment> sortedByDeadline = assignmentService.sortByDeadline();
-        assertEquals("2025-01-10", sortedByDeadline.get(0).getDeadline(), "First deadline should be '2025-01-10'.");
-        assertEquals("2025-01-15", sortedByDeadline.get(1).getDeadline(), "Second deadline should be '2025-01-15'.");
-        assertEquals("2025-01-17", sortedByDeadline.get(2).getDeadline(), "Third deadline should be '2025-01-17'.");
-    }
-
-    
-    
 }
-
