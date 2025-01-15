@@ -23,7 +23,7 @@ public class AssignmentService {
         System.out.println("Assignment data loaded from: " + storageFileName + ". Current assignments: " + assignmentList.size());
     }
 
-    // Add a new assignment
+    //add a new assignment
     public void addAssignment(String title, String description, String deadline, String priority) {
         Assignment newAssignment = new Assignment(title, description, deadline, priority);
         assignmentList.add(newAssignment);
@@ -31,7 +31,7 @@ public class AssignmentService {
         System.out.println("Assignment added successfully: " + newAssignment);
     }
 
-    // Update an existing assignment 
+    //update an existing assignment 
     public void updateAssignment(String oldTitle, String newTitle, String newDescription, String newDeadline, String newPriority) {
         boolean found = false;
 
@@ -45,7 +45,6 @@ public class AssignmentService {
                 break;
             }
         }
-
         if (found) {
             FileHandler.saveToFile(assignmentList, storageFileName); // Generic save method
             System.out.println("Assignment updated successfully: " + newTitle);
@@ -54,7 +53,7 @@ public class AssignmentService {
         }
     }
 
-    // Delete an assignment
+    //deletes an assignment
     public void deleteAssignment(String title) {
         boolean removed = assignmentList.removeIf(assignment -> assignment.getTitle().equalsIgnoreCase(title));
 
@@ -66,7 +65,7 @@ public class AssignmentService {
         }
     }
 
-    // Assignment progress
+    //assignment progress
     public void updateAssignmentProgress(String title, int completionPercentage) {
         for (Assignment assignment : assignmentList) {
             if (assignment.getTitle().equalsIgnoreCase(title)) {
@@ -79,7 +78,7 @@ public class AssignmentService {
         System.out.println("Error: No matching assignment found to update progress.");
     }
 
-    // Calculate overall completion progress
+    //calculate overall completion progress
     public double calculateOverallProgress() {
         if (assignmentList.isEmpty()) {
             System.out.println("No assignments available to calculate progress.");
@@ -93,7 +92,7 @@ public class AssignmentService {
         return (double) totalProgress / assignmentList.size();
     }
 
-    // Get assignments sorted by priority
+    //get assignments sorted by priority
     public List<Assignment> getAssignmentsSortedByPriority() {
         List<String> priorityOrder = List.of("High", "Medium", "Low");
 
@@ -105,14 +104,14 @@ public class AssignmentService {
                 .collect(Collectors.toList());
     }
 
-    // Retrieve assignments sorted by deadline
+    //retrieve assignments sorted by deadline
     public List<Assignment> getAssignmentsSortedByDeadline() {
         return assignmentList.stream()
                 .sorted(Comparator.comparing(Assignment::getDeadline))
                 .collect(Collectors.toList());
     }
 
-    // Display all assignments
+    //display all assignments
     public void displayAssignments() {
         if (assignmentList.isEmpty()) {
             System.out.println("No assignments found.");
@@ -124,8 +123,25 @@ public class AssignmentService {
             System.out.println(assignment);
         }
     }
-
-    // Analyze and display overdue assignments
+    public List<Assignment> getAssignmentsSortedByPriorityAndDeadline() {
+    	 return assignmentList.stream()
+                .sorted((a1, a2) -> {
+                    int priorityComparison = a1.getPriority().compareTo(a2.getPriority());
+                    if (priorityComparison == 0) {
+                        //if priorities are the same, sort by deadline
+                        return a1.getDeadline().compareTo(a2.getDeadline());
+                    }
+                    return priorityComparison;
+                })
+                .collect(Collectors.toList());
+    }
+ //method to get assignments sorted by title
+    public List<Assignment> getAssignmentsSortedByTitle() {
+        return assignmentList.stream()
+                .sorted(Comparator.comparing(Assignment::getTitle))
+                .collect(Collectors.toList());
+    }
+    //analyze and display overdue assignments
     public List<Assignment> getOverdueAssignments() {
         LocalDate today = LocalDate.now();
         return assignmentList.stream()
